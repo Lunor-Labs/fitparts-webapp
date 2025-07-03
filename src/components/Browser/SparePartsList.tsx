@@ -33,10 +33,15 @@ const SparePartsList: React.FC<SparePartsListProps> = ({ category, onBack }) => 
       );
       
       const snapshot = await getDocs(q);
-      const partsList = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as SparePart[];
+      const partsList = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt),
+          updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt)
+        };
+      }) as SparePart[];
       
       setParts(partsList);
 
@@ -47,7 +52,12 @@ const SparePartsList: React.FC<SparePartsListProps> = ({ category, onBack }) => 
       for (const shopId of shopIds) {
         const shopDoc = await getDocs(query(collection(db, 'shops'), where('id', '==', shopId)));
         if (!shopDoc.empty) {
-          shopData[shopId] = shopDoc.docs[0].data() as Shop;
+          const shopDocData = shopDoc.docs[0].data();
+          shopData[shopId] = {
+            ...shopDocData,
+            createdAt: shopDocData.createdAt?.toDate ? shopDocData.createdAt.toDate() : new Date(shopDocData.createdAt),
+            updatedAt: shopDocData.updatedAt?.toDate ? shopDocData.updatedAt.toDate() : new Date(shopDocData.updatedAt)
+          } as Shop;
         }
       }
       

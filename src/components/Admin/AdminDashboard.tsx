@@ -23,34 +23,54 @@ const AdminDashboard: React.FC = () => {
     try {
       // Load users
       const usersSnapshot = await getDocs(collection(db, 'users'));
-      const usersList = usersSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as User[];
+      const usersList = usersSnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt),
+          updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt)
+        };
+      }) as User[];
       setUsers(usersList);
 
       // Load shops
       const shopsSnapshot = await getDocs(collection(db, 'shops'));
-      const shopsList = shopsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Shop[];
+      const shopsList = shopsSnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt),
+          updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt)
+        };
+      }) as Shop[];
       setShops(shopsList);
 
       // Load spare parts
       const partsSnapshot = await getDocs(collection(db, 'spareParts'));
-      const partsList = partsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as SparePart[];
+      const partsList = partsSnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt),
+          updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt)
+        };
+      }) as SparePart[];
       setParts(partsList);
 
       // Load category proposals
       const proposalsSnapshot = await getDocs(collection(db, 'categoryProposals'));
-      const proposalsList = proposalsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as CategoryProposal[];
+      const proposalsList = proposalsSnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt),
+          reviewedAt: data.reviewedAt?.toDate ? data.reviewedAt.toDate() : (data.reviewedAt ? new Date(data.reviewedAt) : undefined)
+        };
+      }) as CategoryProposal[];
       setProposals(proposalsList);
     } catch (error) {
       console.error('Error loading admin data:', error);

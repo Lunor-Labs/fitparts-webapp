@@ -34,25 +34,41 @@ const Dashboard: React.FC = () => {
       const shopQuery = query(collection(db, 'shops'), where('sellerId', '==', user.id));
       const shopSnapshot = await getDocs(shopQuery);
       if (!shopSnapshot.empty) {
-        setShop({ id: shopSnapshot.docs[0].id, ...shopSnapshot.docs[0].data() } as ShopType);
+        const shopData = shopSnapshot.docs[0].data();
+        setShop({ 
+          id: shopSnapshot.docs[0].id, 
+          ...shopData,
+          createdAt: shopData.createdAt?.toDate ? shopData.createdAt.toDate() : new Date(shopData.createdAt),
+          updatedAt: shopData.updatedAt?.toDate ? shopData.updatedAt.toDate() : new Date(shopData.updatedAt)
+        } as ShopType);
       }
 
       // Load spare parts
       const partsQuery = query(collection(db, 'spareParts'), where('sellerId', '==', user.id));
       const partsSnapshot = await getDocs(partsQuery);
-      const partsList = partsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as SparePart[];
+      const partsList = partsSnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt),
+          updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt)
+        };
+      }) as SparePart[];
       setParts(partsList);
 
       // Load category proposals
       const proposalsQuery = query(collection(db, 'categoryProposals'), where('sellerId', '==', user.id));
       const proposalsSnapshot = await getDocs(proposalsQuery);
-      const proposalsList = proposalsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as CategoryProposal[];
+      const proposalsList = proposalsSnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt),
+          reviewedAt: data.reviewedAt?.toDate ? data.reviewedAt.toDate() : (data.reviewedAt ? new Date(data.reviewedAt) : undefined)
+        };
+      }) as CategoryProposal[];
       setProposals(proposalsList);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
